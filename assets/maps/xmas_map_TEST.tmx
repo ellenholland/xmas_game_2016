@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="64" tileheight="64" nextobjectid="1">
+ <tileset firstgid="1" name="xmas_trees" tilewidth="128" tileheight="178" tilecount="2" columns="0">
+  <tile id="0">
+   <image width="64" height="128" source="tiles/xmas_tree_64x128.png"/>
+  </tile>
+  <tile id="1">
+   <image width="128" height="178" source="tiles/xmas_tree_128x178.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="3" name="winter_tiles" tilewidth="64" tileheight="64" tilecount="2" columns="0">
+  <tile id="0">
+   <image width="64" height="64" source="tiles/snow_block_1_64x64.png"/>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="blocked" type="bool" value="true"/>
+   </properties>
+   <image width="64" height="64" source="tiles/snow_rock_block_64x64.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="5" name="summer_tiles" tilewidth="64" tileheight="64" tilecount="2" columns="0">
+  <tile id="0">
+   <image width="64" height="64" source="tiles/grass_block_64x64.png"/>
+  </tile>
+  <tile id="1">
+   <image width="64" height="64" source="tiles/rock_block_64x64.png"/>
+  </tile>
+ </tileset>
+ <layer name="ground" width="10" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC2NhYGBgIRIzE8Cj6vCrIwYDAErrvGiQAQAA
+  </data>
+ </layer>
+ <layer name="foliage" width="10" height="10">
+  <properties>
+   <property name="blocked" type="bool" value="true"/>
+  </properties>
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC2NgIB4wkik3EICJjnZRM1wABHytoJABAAA=
+  </data>
+ </layer>
+</map>
