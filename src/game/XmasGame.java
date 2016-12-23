@@ -73,15 +73,14 @@ public class XmasGame extends BasicGame {
 
         // build a collision map based on tile properties in the TileD map
         blocked = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
-        for (int xAxis=0; xAxis<xmasMap.getWidth(); xAxis++)
-        {
-            for (int yAxis=0; yAxis<xmasMap.getHeight(); yAxis++)
-            {
-                int tileID = xmasMap.getTileId(xAxis, yAxis, 0);
-                String value = xmasMap.getTileProperty(tileID, "blocked", "false");
-                if ("true".equals(value))
-                {
-                    blocked[xAxis][yAxis] = true;
+        for (int xAxis=0; xAxis < xmasMap.getWidth(); xAxis++) {
+            for (int yAxis=0; yAxis < xmasMap.getHeight(); yAxis++) {
+                for (int layer = 0; layer < xmasMap.getLayerCount(); layer++) {
+                    int tileID = xmasMap.getTileId(xAxis, yAxis, layer);
+                    String value = xmasMap.getTileProperty(tileID, "blocked", "false");
+                    if ("true".equals(value)) {
+                        blocked[xAxis][yAxis] = true;
+                    }
                 }
             }
         }
@@ -132,10 +131,13 @@ public class XmasGame extends BasicGame {
         }
     }
 
-    public void render(GameContainer container, Graphics g) throws SlickException
-    {
-        xmasMap.render(0, 0);
+    public void render(GameContainer container, Graphics g) throws SlickException {
+        // Rendering the ground layer (last parameter is layer index)
+        xmasMap.render(0, 0, 0);
+        // Rendering Player
         spritePlayer.draw((int)xPlayer, (int)yPlayer);
+        //Rendering foliage layer overtop the player
+        xmasMap.render(0,0, 1);
     }
 
     private boolean isBlocked(float x, float y)
