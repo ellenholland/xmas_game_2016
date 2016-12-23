@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="64" tileheight="64" nextobjectid="1">
+ <tileset firstgid="1" name="snow_1" tilewidth="64" tileheight="64" tilecount="1" columns="1">
+  <image source="tiles/snow_block_1_64x64.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="2" name="snow_rock" tilewidth="64" tileheight="64" tilecount="1" columns="1">
+  <image source="tiles/snow_rock_block_64x64.png" width="64" height="64"/>
+  <tile id="0">
+   <properties>
+    <property name="blocked" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="3" name="xmas_tree_huge" tilewidth="128" tileheight="178" tilecount="1" columns="1">
+  <image source="tiles/xmas_tree_128x178.png" width="128" height="178"/>
+  <tile id="0">
+   <properties>
+    <property name="blocked" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="4" name="xmas_tree_tall" tilewidth="64" tileheight="128" tilecount="1" columns="1">
+  <image source="tiles/xmas_tree_64x128.png" width="64" height="128"/>
+  <tile id="0">
+   <properties>
+    <property name="blocked" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="ground" width="20" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC9VUyw4AIAgy//+ju7ZGAdqlg7MtxwAfGRH5OAYJVpNLdvFObxcPcUC5onf3quIf49Xlx3xx+nfT+mJekC87duUP1f2Cp863MledfWE62B1hb/cGIT6q1hM/tpOq1hue22N1P7oxAZvufzRABgAA
+  </data>
+ </layer>
+ <layer name="trees" width="20" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC2NgoD5gIVNuFGAC5oF2AB3AaHoZBaNgaAIAN9StmEAGAAA=
+  </data>
+ </layer>
+</map>

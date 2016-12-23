@@ -19,19 +19,15 @@ public class XmasGame extends BasicGame {
 
     public XmasGame() {
         super("Xmas Game");
-
-
     }
 
     public static void main(String[] arguments) {
-        try
-        {
+        try {
             AppGameContainer app = new AppGameContainer(new XmasGame());
             app.setDisplayMode(640, 640, false);
             app.start();
         }
-        catch (SlickException e)
-        {
+        catch (SlickException e) {
             e.printStackTrace();
         }
     }
@@ -87,16 +83,13 @@ public class XmasGame extends BasicGame {
     }
 
     @Override
-    public void update(GameContainer container, int delta) throws SlickException
-    {
+    public void update(GameContainer container, int delta) throws SlickException {
         Input input = container.getInput();
 
         float playerSpeed = 0.3f; // Higher values = faster player speed
-        if (input.isKeyDown(Input.KEY_UP))
-        {
+        if (input.isKeyDown(Input.KEY_UP)) {
             spritePlayer = upPlayer;
-            if (!isBlocked(xPlayer, yPlayer - delta * playerSpeed))
-            {
+            if (!isBlocked(xPlayer, yPlayer - delta * playerSpeed)) {
                 spritePlayer.update(delta);
                 // The lower the delta the slowest the sprite will animate.
                 yPlayer -= delta * playerSpeed;
@@ -136,7 +129,7 @@ public class XmasGame extends BasicGame {
         xmasMap.render(0, 0, 0);
         // Rendering Player
         spritePlayer.draw((int)xPlayer, (int)yPlayer);
-        //Rendering foliage layer overtop the player
+        //Rendering foliage layer over-top the player
         xmasMap.render(0,0, 1);
     }
 
