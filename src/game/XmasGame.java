@@ -3,6 +3,8 @@ package game;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
+import static java.lang.Math.abs;
+
 /**
  * @author Daniel J. Holland
  * @version 1.0
@@ -10,9 +12,12 @@ import org.newdawn.slick.tiled.TiledMap;
  */
 public class XmasGame extends BasicGame {
 
+    //private int screenWidth, screenHeight;
     private TiledMap xmasMap;
     private Animation spritePlayer, upPlayer, downPlayer, leftPlayer, rightPlayer;
+    private Animation spriteCat, upCat, downCat, leftCat, rightCat;
     private float xPlayer, yPlayer;
+    private float xCat, yCat;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
     private boolean[][] blocked;
     private static final int SIZE = 64; // Tile size
@@ -36,23 +41,15 @@ public class XmasGame extends BasicGame {
     public void init(GameContainer container) throws SlickException {
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
 
-        // Defining player animations
-        String pImgDown = "assets/players/generic_player/player_down_64x64.png";
-        String pImgUp = "assets/players/generic_player/player_up_64x64.png";
-        String pImgLeft = "assets/players/generic_player/player_left_64x64.png";
-        String pImgRight = "assets/players/generic_player/player_right_64x64.png";
-        Image[] movementUp = {
-                new Image(pImgUp),
-                new Image(pImgUp)};
-        Image [] movementDown = {
-                new Image(pImgDown),
-                new Image(pImgDown)};
-        Image [] movementLeft = {
-                new Image(pImgLeft),
-                new Image(pImgLeft)};
-        Image [] movementRight = {
-                new Image(pImgRight),
-                new Image(pImgRight)};
+        /* Defining player animations */
+        String pImgDown = "assets/characters/generic_player/player_down_64x64.png";
+        String pImgUp = "assets/characters/generic_player/player_up_64x64.png";
+        String pImgLeft = "assets/characters/generic_player/player_left_64x64.png";
+        String pImgRight = "assets/characters/generic_player/player_right_64x64.png";
+        Image[] movementUp = {new Image(pImgUp), new Image(pImgUp)};
+        Image [] movementDown = {new Image(pImgDown), new Image(pImgDown)};
+        Image [] movementLeft = {new Image(pImgLeft), new Image(pImgLeft)};
+        Image [] movementRight = {new Image(pImgRight), new Image(pImgRight)};
         int [] duration = {300, 300};
 
         upPlayer = new Animation(movementUp, duration, false);
@@ -66,6 +63,37 @@ public class XmasGame extends BasicGame {
         //Initializing player location
         xPlayer = 128f;
         yPlayer = 128f;
+
+        /* Defining Cat Animations */
+        Image[] movementUpCat = {
+                new Image("assets/characters/zelda/zelda_up_1.png"),
+                new Image("assets/characters/zelda/zelda_up_2.png"),
+                new Image("assets/characters/zelda/zelda_up_3.png")};
+        Image [] movementDownCat = {
+                new Image("assets/characters/zelda/zelda_down_1.png"),
+                new Image("assets/characters/zelda/zelda_down_2.png"),
+                new Image("assets/characters/zelda/zelda_down_3.png")};
+        Image [] movementLeftCat = {
+                new Image("assets/characters/zelda/zelda_left_1.png"),
+                new Image("assets/characters/zelda/zelda_left_2.png"),
+                new Image("assets/characters/zelda/zelda_left_3.png")};
+        Image [] movementRightCat = {
+                new Image("assets/characters/zelda/zelda_right_1.png"),
+                new Image("assets/characters/zelda/zelda_right_2.png"),
+                new Image("assets/characters/zelda/zelda_right_3.png")};
+        int [] durationCat = {100, 100, 100};
+
+        upCat = new Animation(movementUpCat, durationCat, false);
+        downCat = new Animation(movementDownCat, durationCat, false);
+        leftCat = new Animation(movementLeftCat, durationCat, false);
+        rightCat= new Animation(movementRightCat, durationCat, false);
+
+        // Setting initial cat position to right
+        spriteCat = leftCat;
+
+        //Initializing cat location
+        xCat = xPlayer + 64f;
+        yCat = yPlayer + 64f;
 
         // build a collision map based on tile properties in the TileD map
         blocked = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
@@ -86,6 +114,7 @@ public class XmasGame extends BasicGame {
     public void update(GameContainer container, int delta) throws SlickException {
         Input input = container.getInput();
 
+        /* Defining Player Motion */
         float playerSpeed = 0.3f; // Higher values = faster player speed
         if (input.isKeyDown(Input.KEY_UP)) {
             spritePlayer = upPlayer;
@@ -122,14 +151,48 @@ public class XmasGame extends BasicGame {
                 xPlayer += delta * playerSpeed;
             }
         }
+
+        /* Defining Cat Motion - Follows after player*/
+        float catSpeed = 0.08f;
+        if (abs(xPlayer-xCat) > abs(yPlayer-yCat)){
+            if (xPlayer > xCat) {
+                spriteCat = rightCat;
+                spriteCat.update(delta);
+                xCat += delta * catSpeed;
+            }
+            else if (xPlayer < xCat){
+                spriteCat = leftCat;
+                spriteCat.update(delta);
+                xCat -= delta * catSpeed;
+            }
+            else{
+                spriteCat.update(delta);
+            }
+        }
+        else {
+            if (yPlayer > yCat) {
+                spriteCat = downCat;
+                spriteCat.update(delta);
+                yCat += delta * catSpeed;
+            } else if (yPlayer < yCat) {
+                spriteCat = upCat;
+                spriteCat.update(delta);
+                yCat -= delta * catSpeed;
+            } else {
+                spriteCat.update(delta);
+            }
+        }
     }
 
     public void render(GameContainer container, Graphics g) throws SlickException {
         // Rendering the ground layer (last parameter is layer index)
         xmasMap.render(0, 0, 0);
-        // Rendering Player
-        spritePlayer.draw((int)xPlayer, (int)yPlayer);
-        //Rendering foliage layer over-top the player
+
+        // Rendering Characters
+        spriteCat.draw(xCat, yCat);
+        spritePlayer.draw(xPlayer, yPlayer);
+
+        //Rendering foliage layer over-top of Characters
         xmasMap.render(0,0, 1);
     }
 
