@@ -30,28 +30,33 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="6" name="xmas_tree_huge" tilewidth="128" tileheight="178" tilecount="1" columns="1">
-  <image source="tiles/xmas_tree_128x178.png" width="128" height="178"/>
-  <tile id="0">
+ <tileset firstgid="6" name="wood_floor" tilewidth="64" tileheight="64" tilecount="1" columns="1">
+  <image source="tiles/dark_wood_floor_64x64.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="7" name="rug" tilewidth="64" tileheight="64" tilecount="9" columns="3">
+  <image source="tiles/rug_large.png" width="192" height="192"/>
+ </tileset>
+ <tileset firstgid="16" name="xmas_tree_large" tilewidth="64" tileheight="64" tilecount="6" columns="2">
+  <image source="tiles/xmas_tree_128x192.png" width="128" height="192"/>
+  <tile id="4">
+   <properties>
+    <property name="blocked" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="5">
    <properties>
     <property name="blocked" type="bool" value="true"/>
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="7" name="wood_floor" tilewidth="64" tileheight="64" tilecount="1" columns="1">
-  <image source="tiles/dark_wood_floor_64x64.png" width="64" height="64"/>
- </tileset>
- <tileset firstgid="8" name="rug" tilewidth="64" tileheight="64" tilecount="9" columns="3">
-  <image source="tiles/rug_large.png" width="192" height="192"/>
- </tileset>
  <layer name="background" width="10" height="10">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC2NhYGBgIRIzE8Cj6vCrIwYDAErrvGiQAQAA
+   H4sIAAAAAAAAC2NhYGBgIRKzEcC0VscOxBxQzIlHHRcQc0MxDx51vEDMB8X8dPAHtrBEFwcArmLaypABAAA=
   </data>
  </layer>
  <layer name="foreground" width="10" height="10">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC2NgIB6wkik3EICNjnZRM1wAHPfiL5ABAAA=
+   H4sIAAAAAAAAC2NgGBxAAIgFiVAnBMTCRKgTAWJRilw0MAAARY/ROJABAAA=
   </data>
  </layer>
 </map>

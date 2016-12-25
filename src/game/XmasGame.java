@@ -39,7 +39,9 @@ public class XmasGame extends BasicGame {
 
     @Override
     public void init(GameContainer container) throws SlickException {
+        // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
+        //xmasMap = new TiledMap("assets/maps/xmas_house_map_64x64.tmx");
 
         /* Defining player animations */
         String pImgDown = "assets/characters/generic_player/player_down_64x64.png";
@@ -92,8 +94,8 @@ public class XmasGame extends BasicGame {
         spriteCat = leftCat;
 
         //Initializing cat location
-        xCat = xPlayer + 64f;
-        yCat = yPlayer + 64f;
+        xCat = xPlayer ;
+        yCat = yPlayer + 256f;
 
         // build a collision map based on tile properties in the TileD map
         blocked = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
@@ -124,29 +126,23 @@ public class XmasGame extends BasicGame {
                 yPlayer -= delta * playerSpeed;
             }
         }
-        else if (input.isKeyDown(Input.KEY_DOWN))
-        {
+        else if (input.isKeyDown(Input.KEY_DOWN)) {
             spritePlayer = downPlayer;
-            if (!isBlocked(xPlayer, yPlayer + SIZE + delta * playerSpeed))
-            {
+            if (!isBlocked(xPlayer, yPlayer + SIZE + delta * playerSpeed)) {
                 spritePlayer.update(delta);
                 yPlayer += delta * playerSpeed;
             }
         }
-        else if (input.isKeyDown(Input.KEY_LEFT))
-        {
+        else if (input.isKeyDown(Input.KEY_LEFT)) {
             spritePlayer = leftPlayer;
-            if (!isBlocked(xPlayer - delta * playerSpeed, yPlayer))
-            {
+            if (!isBlocked(xPlayer - delta * playerSpeed, yPlayer)) {
                 spritePlayer.update(delta);
                 xPlayer -= delta * playerSpeed;
             }
         }
-        else if (input.isKeyDown(Input.KEY_RIGHT))
-        {
+        else if (input.isKeyDown(Input.KEY_RIGHT)) {
             spritePlayer = rightPlayer;
-            if (!isBlocked(xPlayer + SIZE + delta * playerSpeed, yPlayer))
-            {
+            if (!isBlocked(xPlayer + SIZE + delta * playerSpeed, yPlayer)) {
                 spritePlayer.update(delta);
                 xPlayer += delta * playerSpeed;
             }
@@ -154,32 +150,54 @@ public class XmasGame extends BasicGame {
 
         /* Defining Cat Motion - Follows after player*/
         float catSpeed = 0.08f;
-        if (abs(xPlayer-xCat) > abs(yPlayer-yCat)){
-            if (xPlayer > xCat) {
+        // When traveling diagonally maintain last animation direction
+        if (abs(xPlayer-xCat) + 1 > abs(yPlayer-yCat) &&
+            abs(xPlayer-xCat) - 1 < abs(yPlayer-yCat)) {
+            if (abs(xPlayer-xCat) > abs(yPlayer-yCat)){
+                    if (xPlayer > xCat + 1) {
+                        spriteCat.update(delta);
+                        xCat += delta * catSpeed;
+                    }
+                    else if (xPlayer < xCat - 1){
+                        spriteCat.update(delta);
+                        xCat -= delta * catSpeed;
+                    }
+                }
+                else if (abs(xPlayer-xCat) < abs(yPlayer-yCat)) {
+                    if (yPlayer > yCat + 1) {
+                        spriteCat.update(delta);
+                        yCat += delta * catSpeed;
+                    }
+                    else if (yPlayer < yCat - 1) {
+                        spriteCat.update(delta);
+                        yCat -= delta * catSpeed;
+                    }
+                }
+        }
+        // Left right travel
+        else if (abs(xPlayer-xCat) > abs(yPlayer-yCat)){
+            if (xPlayer > xCat + 1) {
                 spriteCat = rightCat;
                 spriteCat.update(delta);
                 xCat += delta * catSpeed;
             }
-            else if (xPlayer < xCat){
+            else if (xPlayer < xCat - 1){
                 spriteCat = leftCat;
                 spriteCat.update(delta);
                 xCat -= delta * catSpeed;
             }
-            else{
-                spriteCat.update(delta);
-            }
         }
-        else {
-            if (yPlayer > yCat) {
+        // Up down travel
+        else if (abs(xPlayer-xCat) < abs(yPlayer-yCat)) {
+            if (yPlayer > yCat + 1) {
                 spriteCat = downCat;
                 spriteCat.update(delta);
                 yCat += delta * catSpeed;
-            } else if (yPlayer < yCat) {
+            }
+            else if (yPlayer < yCat - 1) {
                 spriteCat = upCat;
                 spriteCat.update(delta);
                 yCat -= delta * catSpeed;
-            } else {
-                spriteCat.update(delta);
             }
         }
     }
