@@ -101,8 +101,8 @@ public class XmasGame extends BasicGame {
         blocked = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
         for (int xAxis=0; xAxis < xmasMap.getWidth(); xAxis++) {
             for (int yAxis=0; yAxis < xmasMap.getHeight(); yAxis++) {
-                for (int layer = 0; layer < xmasMap.getLayerCount(); layer++) {
-                    int tileID = xmasMap.getTileId(xAxis, yAxis, layer);
+                for (MapLayers layer : MapLayers.values()){
+                    int tileID = xmasMap.getTileId(xAxis, yAxis, layer.getValue());
                     String value = xmasMap.getTileProperty(tileID, "blocked", "false");
                     if ("true".equals(value)) {
                         blocked[xAxis][yAxis] = true;
@@ -204,14 +204,14 @@ public class XmasGame extends BasicGame {
 
     public void render(GameContainer container, Graphics g) throws SlickException {
         // Rendering the ground layer (last parameter is layer index)
-        xmasMap.render(0, 0, 0);
+        xmasMap.render(0, 0, MapLayers.BACKGROUND.getValue());
 
         // Rendering Characters
         spriteCat.draw(xCat, yCat);
         spritePlayer.draw(xPlayer, yPlayer);
 
         //Rendering foliage layer over-top of Characters
-        xmasMap.render(0,0, 1);
+        xmasMap.render(0,0, MapLayers.FOREGROUND.getValue());
     }
 
     private boolean isBlocked(float x, float y)
