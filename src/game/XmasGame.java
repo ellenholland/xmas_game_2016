@@ -1,13 +1,11 @@
 package game;
 
-import com.sun.org.apache.xerces.internal.impl.dv.xs.AnyURIDV;
 import objects.Character;
 import objects.ChasingCat;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import static java.lang.Math.abs;
 
@@ -27,6 +25,7 @@ public class XmasGame extends BasicGame {
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
     private boolean[][] blocked, playerSpawn, catSpawn, goalBlock;
     private static final int SIZE = 64; // Tile size
+    private Sound angryCatSound;
 
     public XmasGame() {
         super("Xmas Game");
@@ -48,6 +47,10 @@ public class XmasGame extends BasicGame {
         // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
         //xmasMap = new TiledMap("assets/maps/xmas_house_map_64x64.tmx");
+
+        // Defining sounds
+        angryCatSound = new Sound("assets/sounds/angry_cat_sounds.wav");
+
 
         /* Defining player animations */
         String pImgDown = "assets/characters/generic_player/player_down_64x64.png";
@@ -99,7 +102,7 @@ public class XmasGame extends BasicGame {
 
         // Generating cat swarm
         catSwarm = new ArrayList<>();
-        int totalCats = 4; // Total number of cats on screen a the same time
+        int totalCats = 10; // Total number of cats on screen a the same time
         for (int i = 0; i < totalCats; i++){
             catSwarm.add(new ChasingCat(upCat, downCat, leftCat, rightCat));
         }
@@ -242,6 +245,7 @@ public class XmasGame extends BasicGame {
         if ((targetX + 64 > cat.getX() && targetX - 1 < cat.getX()) &&
             (targetY + 64 > cat.getY() && targetY - 1 < cat.getY()) ){
             cat.kill();
+            angryCatSound.play();
         }
         else {
             cat.update(delta);
