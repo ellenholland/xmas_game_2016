@@ -1,7 +1,13 @@
 package game;
 
+import com.sun.org.apache.xerces.internal.impl.dv.xs.AnyURIDV;
+import objects.Character;
+import objects.ChasingCat;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import static java.lang.Math.abs;
 
@@ -12,14 +18,14 @@ import static java.lang.Math.abs;
  */
 public class XmasGame extends BasicGame {
 
-    //private int screenWidth, screenHeight;
     private TiledMap xmasMap;
     private Animation spritePlayer, upPlayer, downPlayer, leftPlayer, rightPlayer;
     private Animation spriteCat, upCat, downCat, leftCat, rightCat;
+    private ArrayList<ChasingCat> catSwarm;
     private float xPlayer, yPlayer;
     private float xCat, yCat;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
-    private boolean[][] blocked;
+    private boolean[][] blocked, playerSpawn, catSpawn, goalBlock;
     private static final int SIZE = 64; // Tile size
 
     public XmasGame() {
@@ -65,6 +71,7 @@ public class XmasGame extends BasicGame {
         //Initializing player location
         xPlayer = 128f;
         yPlayer = 128f;
+        //spawnPlayer
 
         /* Defining Cat Animations */
         Image[] movementUpCat = {
@@ -90,31 +97,51 @@ public class XmasGame extends BasicGame {
         leftCat = new Animation(movementLeftCat, durationCat, false);
         rightCat= new Animation(movementRightCat, durationCat, false);
 
-        // Setting initial cat position to right
-        spriteCat = leftCat;
+        // Generating cat swarm
+        catSwarm = new ArrayList<>();
+        int totalCats = 4; // Total number of cats on screen a the same time
+        for (int i = 0; i < totalCats; i++){
+            catSwarm.add(new ChasingCat(upCat, downCat, leftCat, rightCat));
+        }
 
-        //Initializing cat location
-        xCat = xPlayer ;
-        yCat = yPlayer + 256f;
-
-        // build a collision map based on tile properties in the TileD map
+        // building collision and game maps based on tile properties in the TileD map
         blocked = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
+        catSpawn = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
+        playerSpawn = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
+        goalBlock = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
         for (int xAxis=0; xAxis < xmasMap.getWidth(); xAxis++) {
             for (int yAxis=0; yAxis < xmasMap.getHeight(); yAxis++) {
+                // Getting spawn points and goal blocks
+                int tileID = xmasMap.getTileId(xAxis, yAxis, MapLayers.GAME.getValue());
+                String value = xmasMap.getTileProperty(tileID, "playerSpawn", "false");
+                if ("true".equals(value)) {
+                    playerSpawn[xAxis][yAxis] = true;
+                }
+                value = xmasMap.getTileProperty(tileID, "catSpawn", "false");
+                if ("true".equals(value)) {
+                    catSpawn[xAxis][yAxis] = true;
+                }
+                value = xmasMap.getTileProperty(tileID, "goal", "false");
+                if ("true".equals(value)) {
+                    goalBlock[xAxis][yAxis] = true;
+                }
+                // Building collision map
                 for (MapLayers layer : MapLayers.values()){
-                    int tileID = xmasMap.getTileId(xAxis, yAxis, layer.getValue());
-                    String value = xmasMap.getTileProperty(tileID, "blocked", "false");
+                    tileID = xmasMap.getTileId(xAxis, yAxis, layer.getValue());
+                    value = xmasMap.getTileProperty(tileID, "blocked", "false");
                     if ("true".equals(value)) {
                         blocked[xAxis][yAxis] = true;
                     }
                 }
             }
         }
+
     }
 
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
         Input input = container.getInput();
+        spawnCats();
 
         /* Defining Player Motion */
         float playerSpeed = 0.3f; // Higher values = faster player speed
@@ -148,58 +175,13 @@ public class XmasGame extends BasicGame {
             }
         }
 
-        /* Defining Cat Motion - Follows after player*/
-        float catSpeed = 0.08f;
-        // When traveling diagonally maintain last animation direction
-        if (abs(xPlayer-xCat) + 1 > abs(yPlayer-yCat) &&
-            abs(xPlayer-xCat) - 1 < abs(yPlayer-yCat)) {
-            if (abs(xPlayer-xCat) > abs(yPlayer-yCat)){
-                    if (xPlayer > xCat + 1) {
-                        spriteCat.update(delta);
-                        xCat += delta * catSpeed;
-                    }
-                    else if (xPlayer < xCat - 1){
-                        spriteCat.update(delta);
-                        xCat -= delta * catSpeed;
-                    }
-                }
-                else if (abs(xPlayer-xCat) < abs(yPlayer-yCat)) {
-                    if (yPlayer > yCat + 1) {
-                        spriteCat.update(delta);
-                        yCat += delta * catSpeed;
-                    }
-                    else if (yPlayer < yCat - 1) {
-                        spriteCat.update(delta);
-                        yCat -= delta * catSpeed;
-                    }
-                }
-        }
-        // Left right travel
-        else if (abs(xPlayer-xCat) > abs(yPlayer-yCat)){
-            if (xPlayer > xCat + 1) {
-                spriteCat = rightCat;
-                spriteCat.update(delta);
-                xCat += delta * catSpeed;
-            }
-            else if (xPlayer < xCat - 1){
-                spriteCat = leftCat;
-                spriteCat.update(delta);
-                xCat -= delta * catSpeed;
+        /* Updating CAT SWARM */
+        for (ChasingCat cat : catSwarm){
+            if (cat.isAlive()){
+                chasingCatUpdate(cat, xPlayer, yPlayer, delta);
             }
         }
-        // Up down travel
-        else if (abs(xPlayer-xCat) < abs(yPlayer-yCat)) {
-            if (yPlayer > yCat + 1) {
-                spriteCat = downCat;
-                spriteCat.update(delta);
-                yCat += delta * catSpeed;
-            }
-            else if (yPlayer < yCat - 1) {
-                spriteCat = upCat;
-                spriteCat.update(delta);
-                yCat -= delta * catSpeed;
-            }
-        }
+
     }
 
     public void render(GameContainer container, Graphics g) throws SlickException {
@@ -207,7 +189,11 @@ public class XmasGame extends BasicGame {
         xmasMap.render(0, 0, MapLayers.BACKGROUND.getValue());
 
         // Rendering Characters
-        spriteCat.draw(xCat, yCat);
+        for (ChasingCat cat : catSwarm){
+            if (cat.isAlive()){
+                cat.draw();
+            }
+        }
         spritePlayer.draw(xPlayer, yPlayer);
 
         //Rendering foliage layer over-top of Characters
@@ -219,6 +205,87 @@ public class XmasGame extends BasicGame {
         int xBlock = (int)x / SIZE;
         int yBlock = (int)y / SIZE;
         return blocked[xBlock][yBlock];
+    }
+
+    private void spawnCats(){
+        // Spawning Cats
+        int catCount =  -1;
+        for (ChasingCat cat : catSwarm){
+            if (!cat.isAlive()){
+                catCount ++;
+            }
+        }
+        for (int xAxis = 0; xAxis < catSpawn[0].length ; xAxis++) {
+            if (catCount < 0){
+                break;
+            }
+            for (int yAxis = 0; yAxis < catSpawn.length; yAxis++) {
+                if (catCount < 0){
+                    break;
+                }
+                if (catSpawn[xAxis][yAxis]) {
+                    if (!catSwarm.get(catCount).isAlive()) {
+                        catSwarm.get(catCount).setAlive();
+                        catSwarm.get(catCount).setPosition((xAxis) * 64, (yAxis) * 64);
+                        catCount --;
+                    }
+                }
+            }
+        }
+
+    }
+
+    private void chasingCatUpdate(ChasingCat cat, float targetX, float targetY, int delta){
+        /* Defining Cat Motion - Follows after target*/
+        float catSpeed = 0.08f;
+        // If cat has reached its target... kill it!
+        if ((targetX + 64 > cat.getX() && targetX - 1 < cat.getX()) &&
+            (targetY + 64 > cat.getY() && targetY - 1 < cat.getY()) ){
+            cat.kill();
+        }
+        else {
+            cat.update(delta);
+            // When traveling diagonally maintain last animation direction
+            if (abs(targetX - cat.getX()) + 1 > abs(targetY - cat.getY()) &&
+                    abs(targetX - cat.getX()) - 1 < abs(targetY - cat.getY())) {
+                if (abs(targetX - cat.getX()) > abs(targetY - cat.getY())) {
+                    if (targetX > cat.getX() + 1) {
+                        cat.setX(cat.getX() + delta * catSpeed);
+                    } else {
+                        cat.setX(cat.getX() - delta * catSpeed);
+                    }
+                }
+                else {
+                    if (targetY > cat.getY() + 1) {
+                        cat.setY(cat.getY() + delta * catSpeed);
+                    } else {
+                        cat.setY(cat.getY() - delta * catSpeed);
+                    }
+                }
+            }
+            // Left right travel
+            else if (abs(targetX - cat.getX()) > abs(targetY - cat.getY())) {
+                if (targetX > cat.getX() + 1) {
+                    cat.setAnimation(Character.AnimationDirection.RIGHT);
+                    cat.setX(cat.getX() + delta * catSpeed);
+                }
+                else {
+                    cat.setAnimation(Character.AnimationDirection.LEFT);
+                    cat.setX(cat.getX() - delta * catSpeed);
+                }
+            }
+            // Up down travel
+            else {//if (abs(targetX-cat.getX()) < abs(targetY-yCat)) {
+                if (targetY > cat.getY() + 1) {
+                    cat.setAnimation(Character.AnimationDirection.DOWN);
+                    cat.setY(cat.getY() + delta * catSpeed);
+                }
+                else {
+                    cat.setAnimation(Character.AnimationDirection.UP);
+                    cat.setY(cat.getY() - delta * catSpeed);
+                }
+            }
+        }
     }
 
 }
