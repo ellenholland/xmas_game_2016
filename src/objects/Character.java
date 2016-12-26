@@ -10,7 +10,7 @@ import org.newdawn.slick.Animation;
 public abstract class Character {
 
     public enum AnimationDirection {
-        UP, DOWN, LEFT, RIGHT;
+        UP, DOWN, LEFT, RIGHT
     }
 
     private Animation characterSprite, upAnim, downAnim, leftAnim, rightAnim;
@@ -26,6 +26,10 @@ public abstract class Character {
 
     public void setAnimation(AnimationDirection anim){
         this.characterSprite = getAnimationDirection(anim);
+    }
+
+    public void setAnimation(Animation animation){
+        characterSprite = animation;
     }
 
     public void setPosition(float xpos, float yPos){
@@ -47,6 +51,22 @@ public abstract class Character {
 
     public float getY(){
         return yPos;
+    }
+
+    public Animation getUpAnimation(){
+        return upAnim;
+    }
+
+    public Animation getDownAnimation(){
+        return downAnim;
+    }
+
+    public Animation getLeftAnimation(){
+        return leftAnim;
+    }
+
+    public Animation getRightAnimation(){
+        return rightAnim;
     }
 
     public Animation getCurrentAnimation(){

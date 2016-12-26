@@ -2,6 +2,7 @@ package game;
 
 import objects.Character;
 import objects.ChasingCat;
+import objects.PlayerCharacter;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
@@ -17,15 +18,14 @@ import static java.lang.Math.abs;
 public class XmasGame extends BasicGame {
 
     private TiledMap xmasMap;
-    private Animation spritePlayer, upPlayer, downPlayer, leftPlayer, rightPlayer;
+    private Animation upPlayer, downPlayer, leftPlayer, rightPlayer;
     private Animation spriteCat, upCat, downCat, leftCat, rightCat;
     private ArrayList<ChasingCat> catSwarm;
-    private float xPlayer, yPlayer;
-    private float xCat, yCat;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
     private boolean[][] blocked, playerSpawn, catSpawn, goalBlock;
     private static final int SIZE = 64; // Tile size
     private Sound angryCatSound;
+    private PlayerCharacter playerCharacter;
 
     public XmasGame() {
         super("Xmas Game");
@@ -49,7 +49,7 @@ public class XmasGame extends BasicGame {
         //xmasMap = new TiledMap("assets/maps/xmas_house_map_64x64.tmx");
 
         // Defining sounds
-        angryCatSound = new Sound("assets/sounds/angry_cat_sounds.wav");
+        angryCatSound = new Sound("assets/sounds/cat_death_sound.wav");
 
 
         /* Defining player animations */
@@ -57,24 +57,42 @@ public class XmasGame extends BasicGame {
         String pImgUp = "assets/characters/generic_player/player_up_64x64.png";
         String pImgLeft = "assets/characters/generic_player/player_left_64x64.png";
         String pImgRight = "assets/characters/generic_player/player_right_64x64.png";
-        Image[] movementUp = {new Image(pImgUp), new Image(pImgUp)};
-        Image [] movementDown = {new Image(pImgDown), new Image(pImgDown)};
-        Image [] movementLeft = {new Image(pImgLeft), new Image(pImgLeft)};
-        Image [] movementRight = {new Image(pImgRight), new Image(pImgRight)};
-        int [] duration = {300, 300};
+        Image[] movementUp = {
+                new Image("assets/characters/nerd_player/nerd_up_2.png"),
+                new Image("assets/characters/nerd_player/nerd_up_1.png"),
+                new Image("assets/characters/nerd_player/nerd_up_2.png"),
+                new Image("assets/characters/nerd_player/nerd_up_3.png")};
+        Image [] movementDown = {
+                new Image("assets/characters/nerd_player/nerd_down_2.png"),
+                new Image("assets/characters/nerd_player/nerd_down_1.png"),
+                new Image("assets/characters/nerd_player/nerd_down_2.png"),
+                new Image("assets/characters/nerd_player/nerd_down_3.png")};
+        Image [] movementLeft = {
+                new Image("assets/characters/nerd_player/nerd_left_2.png"),
+                new Image("assets/characters/nerd_player/nerd_left_1.png"),
+                new Image("assets/characters/nerd_player/nerd_left_2.png"),
+                new Image("assets/characters/nerd_player/nerd_left_3.png")};
+        Image [] movementRight = {
+                new Image("assets/characters/nerd_player/nerd_right_2.png"),
+                new Image("assets/characters/nerd_player/nerd_right_1.png"),
+                new Image("assets/characters/nerd_player/nerd_right_2.png"),
+                new Image("assets/characters/nerd_player/nerd_right_3.png")};
+        int [] duration = {100, 100, 100, 100};
+
 
         upPlayer = new Animation(movementUp, duration, false);
         downPlayer = new Animation(movementDown, duration, false);
         leftPlayer = new Animation(movementLeft, duration, false);
         rightPlayer = new Animation(movementRight, duration, false);
 
+        playerCharacter = new PlayerCharacter(upPlayer, downPlayer, leftPlayer, rightPlayer);
+
         // Setting initial player position to right
-        spritePlayer = rightPlayer;
+        playerCharacter.setAnimation(Character.AnimationDirection.DOWN);
 
         //Initializing player location
-        xPlayer = 128f;
-        yPlayer = 128f;
-        //spawnPlayer
+        playerCharacter.setPosition(128f, 128f);
+        //replace above with spawnPlayer logic here
 
         /* Defining Cat Animations */
         Image[] movementUpCat = {
@@ -149,39 +167,39 @@ public class XmasGame extends BasicGame {
         /* Defining Player Motion */
         float playerSpeed = 0.3f; // Higher values = faster player speed
         if (input.isKeyDown(Input.KEY_UP)) {
-            spritePlayer = upPlayer;
-            if (!isBlocked(xPlayer, yPlayer - delta * playerSpeed)) {
-                spritePlayer.update(delta);
+            playerCharacter.setAnimation(Character.AnimationDirection.UP);
+            if (!isBlocked(playerCharacter.getX(), playerCharacter.getY() - delta * playerSpeed)) {
+                playerCharacter.update(delta);
                 // The lower the delta the slowest the sprite will animate.
-                yPlayer -= delta * playerSpeed;
+                playerCharacter.setY(playerCharacter.getY() - delta * playerSpeed);
             }
         }
         else if (input.isKeyDown(Input.KEY_DOWN)) {
-            spritePlayer = downPlayer;
-            if (!isBlocked(xPlayer, yPlayer + SIZE + delta * playerSpeed)) {
-                spritePlayer.update(delta);
-                yPlayer += delta * playerSpeed;
+            playerCharacter.setAnimation(Character.AnimationDirection.DOWN);
+            if (!isBlocked(playerCharacter.getX(), playerCharacter.getY()+ SIZE + delta * playerSpeed)) {
+                playerCharacter.update(delta);
+                playerCharacter.setY(playerCharacter.getY() + delta * playerSpeed);
             }
         }
         else if (input.isKeyDown(Input.KEY_LEFT)) {
-            spritePlayer = leftPlayer;
-            if (!isBlocked(xPlayer - delta * playerSpeed, yPlayer)) {
-                spritePlayer.update(delta);
-                xPlayer -= delta * playerSpeed;
+            playerCharacter.setAnimation(Character.AnimationDirection.LEFT);
+            if (!isBlocked(playerCharacter.getX() - delta * playerSpeed, playerCharacter.getY())) {
+                playerCharacter.update(delta);
+                playerCharacter.setX(playerCharacter.getX() - delta * playerSpeed);
             }
         }
         else if (input.isKeyDown(Input.KEY_RIGHT)) {
-            spritePlayer = rightPlayer;
-            if (!isBlocked(xPlayer + SIZE + delta * playerSpeed, yPlayer)) {
-                spritePlayer.update(delta);
-                xPlayer += delta * playerSpeed;
+            playerCharacter.setAnimation(Character.AnimationDirection.RIGHT);
+            if (!isBlocked(playerCharacter.getX() + SIZE + delta * playerSpeed, playerCharacter.getY())) {
+                playerCharacter.update(delta);
+                playerCharacter.setX(playerCharacter.getX() + delta * playerSpeed);
             }
         }
 
         /* Updating CAT SWARM */
         for (ChasingCat cat : catSwarm){
             if (cat.isAlive()){
-                chasingCatUpdate(cat, xPlayer, yPlayer, delta);
+                chasingCatUpdate(cat, playerCharacter.getX(), playerCharacter.getY(), delta);
             }
         }
 
@@ -197,7 +215,7 @@ public class XmasGame extends BasicGame {
                 cat.draw();
             }
         }
-        spritePlayer.draw(xPlayer, yPlayer);
+        playerCharacter.draw();
 
         //Rendering foliage layer over-top of Characters
         xmasMap.render(0,0, MapLayers.FOREGROUND.getValue());
@@ -229,7 +247,7 @@ public class XmasGame extends BasicGame {
                 if (catSpawn[xAxis][yAxis]) {
                     if (!catSwarm.get(catCount).isAlive()) {
                         catSwarm.get(catCount).setAlive();
-                        catSwarm.get(catCount).setPosition((xAxis) * 64, (yAxis) * 64);
+                        catSwarm.get(catCount).setPosition((xAxis) * 64 + 32, (yAxis) * 64 + 32);
                         catCount --;
                     }
                 }
