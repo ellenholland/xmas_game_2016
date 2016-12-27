@@ -53,6 +53,10 @@ public abstract class Character {
         return yPos;
     }
 
+    public float getHeight(){
+        return characterSprite.getHeight();
+    }
+
     public Animation getUpAnimation(){
         return upAnim;
     }

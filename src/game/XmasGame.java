@@ -60,10 +60,9 @@ public class XmasGame extends BasicGame {
         /* defining other objects */
         Animation visibleAnimation =
                 new Animation(
-                new Image[]{new Image("C:/Java/projects/xmas_game_2016/assets/other/xmas_present.png")},
+                new Image[]{new Image("assets/other/xmas_present.png")},
                 100,
                 false);
-
         xmasPresent = new Present(visibleAnimation, visibleAnimation);
 
         /* Defining player animations */
@@ -127,12 +126,25 @@ public class XmasGame extends BasicGame {
         downCat = new Animation(movementDownCat, durationCat, false);
         leftCat = new Animation(movementLeftCat, durationCat, false);
         rightCat= new Animation(movementRightCat, durationCat, false);
-
         // Generating cat swarm
         catSwarm = new ArrayList<>();
         int totalCats = 10; // Total number of cats on screen a the same time
         for (int i = 0; i < totalCats; i++){
-            catSwarm.add(new ChasingCat(upCat, downCat, leftCat, rightCat));
+            catSwarm.add(new ChasingCat(upCat, downCat, leftCat, rightCat, new Animation(
+                    new Image[]{
+                            new Image("assets/other/explosion_raw_1.png"),
+                            new Image("assets/other/explosion_raw_2.png"),
+                            new Image("assets/other/explosion_raw_3.png"),
+                            new Image("assets/other/explosion_raw_4.png"),
+                            new Image("assets/other/explosion_raw_5.png"),
+                            new Image("assets/other/explosion_raw_6.png"),
+                            new Image("assets/other/explosion_raw_7.png"),
+                            new Image("assets/other/explosion_raw_8.png"),
+                            new Image("assets/other/explosion_raw_9.png"),
+                            new Image("assets/other/explosion_raw_10.png")
+                    },
+                    new int[] {150  ,100,100,100,100,100,100,100,100,100}, false
+            )));
         }
 
         // building collision and game maps based on tile properties in the TileD map
@@ -173,6 +185,7 @@ public class XmasGame extends BasicGame {
     public void update(GameContainer container, int delta) throws SlickException {
         Input input = container.getInput();
         spawnCats();
+        //explosionAnimation.update(delta);
 
         /* dealing with the presents */
 
@@ -219,7 +232,10 @@ public class XmasGame extends BasicGame {
 
         /* Updating CAT SWARM */
         for (ChasingCat cat : catSwarm){
-            if (cat.isAlive()){
+            if (cat.isDying()){
+                cat.update(delta);
+            }
+            else if (cat.isAlive()){
                 chasingCatUpdate(cat, playerCharacter.getX(), playerCharacter.getY(), delta);
             }
         }
@@ -296,11 +312,13 @@ public class XmasGame extends BasicGame {
         /* Defining Cat Motion - Follows after target*/
         float catSpeed = 0.1f;
         // If cat has reached its target... kill it!
-        if ((targetX + 64 > cat.getX() && targetX - 1 < cat.getX()) &&
-            (targetY + 64 > cat.getY() && targetY - 1 < cat.getY()) ){
+        if ((targetX + SIZE > cat.getX() && targetX - 1 < cat.getX()) &&
+            (targetY + SIZE > cat.getY() && targetY - 1 < cat.getY()) ){
             cat.kill();
             angryCatSound.play();
-            playerScore --;
+            if (playerScore > 0){
+                playerScore --;
+            }
         }
         else {
             cat.update(delta);
