@@ -3,10 +3,12 @@ package game;
 import objects.Character;
 import objects.ChasingCat;
 import objects.PlayerCharacter;
+import objects.Present;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static java.lang.Math.abs;
 
@@ -19,11 +21,13 @@ public class XmasGame extends BasicGame {
 
     private TiledMap xmasMap;
     private Animation upPlayer, downPlayer, leftPlayer, rightPlayer;
-    private Animation spriteCat, upCat, downCat, leftCat, rightCat;
+    private Animation upCat, downCat, leftCat, rightCat;
+    private Present xmasPresent;
     private ArrayList<ChasingCat> catSwarm;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
     private boolean[][] blocked, playerSpawn, catSpawn, goalBlock;
     private static final int SIZE = 64; // Tile size
+    private int playerScore;
     private Sound angryCatSound;
     private PlayerCharacter playerCharacter;
 
@@ -34,7 +38,7 @@ public class XmasGame extends BasicGame {
     public static void main(String[] arguments) {
         try {
             AppGameContainer app = new AppGameContainer(new XmasGame());
-            app.setDisplayMode(640, 640, false);
+            app.setDisplayMode(640, 704, false);
             app.start();
         }
         catch (SlickException e) {
@@ -44,6 +48,8 @@ public class XmasGame extends BasicGame {
 
     @Override
     public void init(GameContainer container) throws SlickException {
+        playerScore = 0;
+
         // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
         //xmasMap = new TiledMap("assets/maps/xmas_house_map_64x64.tmx");
@@ -51,12 +57,16 @@ public class XmasGame extends BasicGame {
         // Defining sounds
         angryCatSound = new Sound("assets/sounds/cat_death_sound.wav");
 
+        /* defining other objects */
+        Animation visibleAnimation =
+                new Animation(
+                new Image[]{new Image("C:/Java/projects/xmas_game_2016/assets/other/xmas_present.png")},
+                100,
+                false);
+
+        xmasPresent = new Present(visibleAnimation, visibleAnimation);
 
         /* Defining player animations */
-        String pImgDown = "assets/characters/generic_player/player_down_64x64.png";
-        String pImgUp = "assets/characters/generic_player/player_up_64x64.png";
-        String pImgLeft = "assets/characters/generic_player/player_left_64x64.png";
-        String pImgRight = "assets/characters/generic_player/player_right_64x64.png";
         Image[] movementUp = {
                 new Image("assets/characters/nerd_player/nerd_up_2.png"),
                 new Image("assets/characters/nerd_player/nerd_up_1.png"),
@@ -164,6 +174,17 @@ public class XmasGame extends BasicGame {
         Input input = container.getInput();
         spawnCats();
 
+        /* dealing with the presents */
+
+        if ((playerCharacter.getX() + 33 > xmasPresent.getX() && playerCharacter.getX() - 30 < xmasPresent.getX()) &&
+                (playerCharacter.getY() + SIZE > xmasPresent.getY() && playerCharacter.getY() - 30 < xmasPresent.getY())){
+            xmasPresent.setInvisible();
+            playerScore += 1;
+        }
+        if (!xmasPresent.isVisible()){
+            spawnPresent();
+        }
+
         /* Defining Player Motion */
         float playerSpeed = 0.3f; // Higher values = faster player speed
         if (input.isKeyDown(Input.KEY_UP)) {
@@ -208,7 +229,8 @@ public class XmasGame extends BasicGame {
     public void render(GameContainer container, Graphics g) throws SlickException {
         // Rendering the ground layer (last parameter is layer index)
         xmasMap.render(0, 0, MapLayers.BACKGROUND.getValue());
-
+        g.drawString("PRESENTS COLLECTED: " + playerScore, 32, 668);
+        xmasPresent.draw();
         // Rendering Characters
         for (ChasingCat cat : catSwarm){
             if (cat.isAlive()){
@@ -226,6 +248,20 @@ public class XmasGame extends BasicGame {
         int xBlock = (int)x / SIZE;
         int yBlock = (int)y / SIZE;
         return blocked[xBlock][yBlock];
+    }
+
+    private void spawnPresent(){
+        //generate random location until non-blocked location found
+        Random rand = new Random();
+
+        int xPos = rand.nextInt(xmasMap.getWidth());
+        int yPos = rand.nextInt(xmasMap.getHeight());
+        while (blocked[xPos][yPos]){
+            xPos = rand.nextInt(xmasMap.getWidth());
+            yPos = rand.nextInt(xmasMap.getHeight());
+        }
+        xmasPresent.setPosition(xPos * SIZE, yPos * SIZE);
+        xmasPresent.setVisible();
     }
 
     private void spawnCats(){
@@ -258,12 +294,13 @@ public class XmasGame extends BasicGame {
 
     private void chasingCatUpdate(ChasingCat cat, float targetX, float targetY, int delta){
         /* Defining Cat Motion - Follows after target*/
-        float catSpeed = 0.08f;
+        float catSpeed = 0.1f;
         // If cat has reached its target... kill it!
         if ((targetX + 64 > cat.getX() && targetX - 1 < cat.getX()) &&
             (targetY + 64 > cat.getY() && targetY - 1 < cat.getY()) ){
             cat.kill();
             angryCatSound.play();
+            playerScore --;
         }
         else {
             cat.update(delta);
