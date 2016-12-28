@@ -57,6 +57,8 @@ public abstract class Character {
         return characterSprite.getHeight();
     }
 
+    public float getWidth(){return characterSprite.getWidth();}
+
     public Animation getUpAnimation(){
         return upAnim;
     }
@@ -75,6 +77,13 @@ public abstract class Character {
 
     public Animation getCurrentAnimation(){
         return characterSprite;
+    }
+
+    public boolean isColliding(Character other){
+        return (((this.getX() >= other.getX() && this.getX() <= other.getX() + other.getWidth()) ||
+                (this.getX() + this.getWidth() >= other.getX() && this.getX() + this.getWidth() <= other.getX() + other.getWidth())) &&
+                ((this.getY() >= other.getY() && this.getY() <= other.getY() + other.getHeight()) ||
+                (this.getY() + this.getHeight() >= other.getY() && this.getY() + this.getHeight() <= other.getY() + other.getHeight())));
     }
 
     public void update(int delta){

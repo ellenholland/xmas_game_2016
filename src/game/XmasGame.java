@@ -236,7 +236,7 @@ public class XmasGame extends BasicGame {
                 cat.update(delta);
             }
             else if (cat.isAlive()){
-                chasingCatUpdate(cat, playerCharacter.getX(), playerCharacter.getY(), delta);
+                chasingCatUpdate(cat, playerCharacter, delta);
             }
         }
 
@@ -306,6 +306,64 @@ public class XmasGame extends BasicGame {
             }
         }
 
+    }
+
+    private void chasingCatUpdate(ChasingCat cat, Character target, int delta){
+        float targetX = target.getX();
+        float targetY = target.getY();
+        /* Defining Cat Motion - Follows after target*/
+        float catSpeed = 0.1f;
+        // If cat has reached its target... kill it!
+        if (cat.isColliding(target)){
+            cat.kill();
+            angryCatSound.play();
+            if (playerScore > 0){
+                playerScore --;
+            }
+        }
+        else {
+            cat.update(delta);
+            // When traveling diagonally maintain last animation direction
+            if (abs(targetX - cat.getX()) + 1 > abs(targetY - cat.getY()) &&
+                    abs(targetX - cat.getX()) - 1 < abs(targetY - cat.getY())) {
+                if (abs(targetX - cat.getX()) > abs(targetY - cat.getY())) {
+                    if (targetX > cat.getX() + 1) {
+                        cat.setX(cat.getX() + delta * catSpeed);
+                    } else {
+                        cat.setX(cat.getX() - delta * catSpeed);
+                    }
+                }
+                else {
+                    if (targetY > cat.getY() + 1) {
+                        cat.setY(cat.getY() + delta * catSpeed);
+                    } else {
+                        cat.setY(cat.getY() - delta * catSpeed);
+                    }
+                }
+            }
+            // Left right travel
+            else if (abs(targetX - cat.getX()) > abs(targetY - cat.getY())) {
+                if (targetX > cat.getX() + 1) {
+                    cat.setAnimation(Character.AnimationDirection.RIGHT);
+                    cat.setX(cat.getX() + delta * catSpeed);
+                }
+                else {
+                    cat.setAnimation(Character.AnimationDirection.LEFT);
+                    cat.setX(cat.getX() - delta * catSpeed);
+                }
+            }
+            // Up down travel
+            else {//if (abs(targetX-cat.getX()) < abs(targetY-yCat)) {
+                if (targetY > cat.getY() + 1) {
+                    cat.setAnimation(Character.AnimationDirection.DOWN);
+                    cat.setY(cat.getY() + delta * catSpeed);
+                }
+                else {
+                    cat.setAnimation(Character.AnimationDirection.UP);
+                    cat.setY(cat.getY() - delta * catSpeed);
+                }
+            }
+        }
     }
 
     private void chasingCatUpdate(ChasingCat cat, float targetX, float targetY, int delta){
