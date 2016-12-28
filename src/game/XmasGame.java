@@ -58,11 +58,8 @@ public class XmasGame extends BasicGame {
         angryCatSound = new Sound("assets/sounds/cat_death_sound.wav");
 
         /* defining other objects */
-        Animation visibleAnimation =
-                new Animation(
-                new Image[]{new Image("assets/other/xmas_present.png")},
-                100,
-                false);
+        Animation visibleAnimation = new Animation(
+                new Image[]{new Image("assets/other/xmas_present.png")}, 100, false);
         xmasPresent = new Present(visibleAnimation, visibleAnimation);
 
         /* Defining player animations */
@@ -189,8 +186,7 @@ public class XmasGame extends BasicGame {
 
         /* dealing with the presents */
 
-        if ((playerCharacter.getX() + 33 > xmasPresent.getX() && playerCharacter.getX() - 30 < xmasPresent.getX()) &&
-                (playerCharacter.getY() + SIZE > xmasPresent.getY() && playerCharacter.getY() - 30 < xmasPresent.getY())){
+        if (playerCharacter.isColliding(xmasPresent)){
             xmasPresent.setInvisible();
             playerScore += 1;
         }
