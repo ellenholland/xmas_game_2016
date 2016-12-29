@@ -185,7 +185,7 @@ public class XmasGame extends BasicGame {
         //explosionAnimation.update(delta);
 
         /* dealing with the presents */
-
+        xmasPresent.update(delta);
         if (playerCharacter.isColliding(xmasPresent)){
             xmasPresent.setInvisible();
             playerScore += 1;
